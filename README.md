@@ -29,7 +29,7 @@ A swift 5.1 package enabling decentralised dependency resolution through protoco
 
 This is how you would do something similar to [Swinject basic usage](https://github.com/Swinject/Swinject#basic-usage)
 
-```
+```swift
 import Foundation
 import Resolve
 
