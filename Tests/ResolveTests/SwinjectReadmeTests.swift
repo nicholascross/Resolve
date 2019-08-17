@@ -1,7 +1,7 @@
 import XCTest
 @testable import Resolve
 
-final class ReadmeTests: XCTestCase {
+final class SwinjectReadmeTests: XCTestCase {
 
     func testReadme() {
         let _ = ExampleContainer.resolve()
