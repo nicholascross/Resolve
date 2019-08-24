@@ -2,6 +2,8 @@
 
 A swift package to support dependency resolution with property wrapper support for ease of use.
 
+__This is an experimental project it most likely will not be maintained in the future, feel free to use/reference it in your own implementation__  👍
+
 ## Examples
 
 This is how you would do something similar to [Swinject basic usage](https://github.com/Swinject/Swinject#basic-usage)
