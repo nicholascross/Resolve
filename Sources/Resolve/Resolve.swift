@@ -9,16 +9,21 @@ import Foundation
 
 public class ResolutionContext {
 
-    private var resolvers: [String:(ResolutionContext)->Any] = [:]
-    private var storers: [String:(Any)->()] = [:]
+    private var resolvers: [String:(ResolutionContext)->Any]
+    private var storers: [String:(Any)->()]
 
     public static let global = ResolutionContext()
 
-    public func resolve<T>(variant: String? = nil) -> T {
+    public init() {
+        self.resolvers = [:]
+        self.storers = [:]
+    }
+
+    public func tryResolve<T>(variant: String? = nil) throws -> T {
         let key = ResolutionContext.keyName(type:T.self, variant: variant)
 
         guard let resolver = resolvers[key] else {
-            fatalError("Cannot resolve unregistered type: \(T.self)")
+            throw ResolutionError.missingResolver
         }
 
         //Use previously registered resolver
@@ -27,8 +32,16 @@ public class ResolutionContext {
         return resolver(self) as! T
     }
 
+    public func resolve<T>(variant: String? = nil) -> T {
+        guard let resolved = try? tryResolve(variant: variant) as T else {
+            fatalError("Cannot resolve unregistered type: \(T.self)")
+        }
+
+        return resolved
+    }
+
     public func store<T>(object: T, variant: String? = nil) {
-        let key = ResolutionContext.keyName(type:T.self, variant: variant)
+        let key = ResolutionContext.keyName(type: T.self, variant: variant)
 
         guard let storer = storers[key] else {
             return
@@ -93,4 +106,8 @@ public struct Resolve<T> {
             self.resolver.store(object: newValue, variant: variant)
         }
     }
+}
+
+public enum ResolutionError: Error {
+    case missingResolver
 }
