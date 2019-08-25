@@ -7,107 +7,47 @@
 
 import Foundation
 
-public class ResolutionContext {
-
-    private var resolvers: [String:(ResolutionContext)->Any]
-    private var storers: [String:(Any)->()]
-
-    public static let global = ResolutionContext()
-
-    public init() {
-        self.resolvers = [:]
-        self.storers = [:]
-    }
-
-    public func tryResolve<T>(variant: String? = nil) throws -> T {
-        let key = ResolutionContext.keyName(type:T.self, variant: variant)
-
-        guard let resolver = resolvers[key] else {
-            throw ResolutionError.missingResolver
-        }
-
-        //Use previously registered resolver
-
-        //It is not be possible to register a resolver that does not return type 'T'
-        return resolver(self) as! T
-    }
-
-    public func resolve<T>(variant: String? = nil) -> T {
-        guard let resolved = try? tryResolve(variant: variant) as T else {
-            fatalError("Cannot resolve unregistered type: \(T.self)")
-        }
-
-        return resolved
-    }
-
-    public func store<T>(object: T, variant: String? = nil) {
-        let key = ResolutionContext.keyName(type: T.self, variant: variant)
-
-        guard let storer = storers[key] else {
-            return
-        }
-
-        storer(object)
-    }
-
-    public func register<T>(variant: String? = nil, resolver: @escaping ()->T) {
-        register(variant: variant, resolver: {_ in resolver() }, storer: {_ in})
-    }
-
-    public func register<T>(variant: String? = nil, resolver: @escaping (ResolutionContext)->T) {
-        register(variant: variant, resolver: resolver, storer: {_ in})
-    }
-
-    public func register<T>(variant: String? = nil, resolver: @escaping (ResolutionContext)->T, storer: @escaping (T)->()) {
-        let key = ResolutionContext.keyName(type:T.self, variant: variant)
-        resolvers[key] = resolver
-        storers[key] = { storer($0 as! T) }
-    }
-
-    public static func keyName<T>(type: T.Type, variant: String?) -> String {
-        guard let suffix = variant else {
-            return "\(String(describing:T.self))"
-        }
-
-        return "\(String(describing:T.self))-\(suffix)"
-    }
-}
-
 @propertyWrapper
 public struct Resolve<T> {
-    private var resolver: ResolutionContext
+    private var register: DependencyRegister
     private var variant: String?
 
-    public init() {
-        self.resolver = .global
-        self.variant = nil
-    }
-
-    public init(resolver: ResolutionContext, variant: String) {
-        self.resolver = resolver
+    public init(register: DependencyRegister, variant: String) {
+        self.register = register
         self.variant = variant
+        register.registerDependencies()
     }
 
-    public init(resolver: ResolutionContext) {
-        self.resolver = resolver
+    public init(register: DependencyRegister) {
+        self.register = register
+        self.variant = nil
+        register.registerDependencies()
+    }
+
+    public init() {
+        self.register = DefaultRegister()
         self.variant = nil
     }
 
     public init(variant: String) {
-        self.resolver = .global
+        self.register = DefaultRegister()
         self.variant = variant
     }
 
     public var wrappedValue:T {
         get {
-            return self.resolver.resolve(variant: variant) as T
+            return self.register.container.resolve(variant: variant) as T
         }
         set {
-            self.resolver.store(object: newValue, variant: variant)
+            self.register.container.store(object: newValue, variant: variant)
         }
     }
-}
 
-public enum ResolutionError: Error {
-    case missingResolver
+    private struct DefaultRegister: DependencyRegister {
+        var container: DependencyContainer = ResolutionContext.global.resolve()
+
+        func registerDependencies() {
+            // do nothing
+        }
+    }
 }
