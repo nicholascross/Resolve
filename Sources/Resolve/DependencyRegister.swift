@@ -13,6 +13,7 @@ public protocol DependencyRegister {
 }
 
 public protocol DependencyContainer {
+    func tryResolve<T>(variant: String?) throws -> T
     func resolve<T>(variant: String?) -> T
     func store<T>(object: T, variant: String?)
     func register<T>(variant: String?, resolver: @escaping ()->T)
