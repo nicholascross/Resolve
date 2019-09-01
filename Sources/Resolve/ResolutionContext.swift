@@ -82,6 +82,12 @@ public class ResolutionContext: DependencyContainer {
         }
     }
 
+    public func removeResolver<T>(for type: T.Type, variant: String? = nil) {
+        let key = ResolutionContext.keyName(type:T.self, variant: variant)
+        resolvers[key] = nil
+        storers[key] = nil
+    }
+
     public func clearResolvers() {
         resolvers = [:]
         storers = [:]
