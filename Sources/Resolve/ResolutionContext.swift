@@ -68,8 +68,8 @@ public class ResolutionContext: DependencyContainer {
         // Registering a dependency register will trigger
         // the registration of the registers dependencies
         if T.self is DependencyRegister.Type {
-            let register: DependencyRegister = resolver(self) as! DependencyRegister
-            register.registerDependencies()
+            let register: DependencyRegister = resolver() as! DependencyRegister
+            register.registerDependencies(container: self)
         }
     }
 

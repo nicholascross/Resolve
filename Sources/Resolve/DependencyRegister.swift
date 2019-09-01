@@ -8,8 +8,7 @@
 import Foundation
 
 public protocol DependencyRegister {
-    func registerDependencies()
-    var container: DependencyContainer { get }
+    func registerDependencies(container: DependencyContainer)
 }
 
 public protocol DependencyContainer {
