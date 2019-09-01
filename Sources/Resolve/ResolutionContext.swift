@@ -67,6 +67,13 @@ public class ResolutionContext: DependencyContainer {
         let key = ResolutionContext.keyName(type:T.self, variant: variant)
         resolvers[key] = resolver
         storers[key] = { storer($0 as! T) }
+
+        // Registering a dependency register will trigger
+        // the registration of the registers dependencies
+        if T.self is DependencyRegister.Type {
+            let register: DependencyRegister = resolver(self) as! DependencyRegister
+            register.registerDependencies()
+        }
     }
 
     public func clearResolvers() {
