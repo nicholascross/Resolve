@@ -19,6 +19,8 @@ public protocol DependencyContainer {
     func register<T>(variant: String?, resolver: @escaping ()->T)
     func register<T>(variant: String?, resolver: @escaping (ResolutionContext)->T)
     func register<T>(variant: String?, resolver: @escaping (ResolutionContext)->T, storer: @escaping (T)->())
+    func removeResolver<T>(for type: T.Type, variant: String?)
+    func clearResolvers()
 }
 
 public extension DependencyContainer {
@@ -43,4 +45,7 @@ public extension DependencyContainer {
         self.register(variant: nil, resolver: resolver, storer: storer)
     }
 
+    func removeResolver<T>(for type: T.Type) {
+        self.removeResolver(for: type, variant: nil)
+    }
 }
