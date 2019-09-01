@@ -65,6 +65,12 @@ public class ResolutionContext: DependencyContainer {
 
     public func register<T>(variant: String? = nil, resolver: @escaping (ResolutionContext)->T, storer: @escaping (T)->()) {
         let key = ResolutionContext.keyName(type:T.self, variant: variant)
+
+        guard resolvers[key] == nil else {
+            // Already has registered resolver
+            return
+        }
+
         resolvers[key] = resolver
         storers[key] = { storer($0 as! T) }
 
