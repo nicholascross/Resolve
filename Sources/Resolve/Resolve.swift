@@ -9,45 +9,35 @@ import Foundation
 
 @propertyWrapper
 public struct Resolve<T> {
-    private var register: DependencyRegister
+    private var container: DependencyContainer
     private var variant: String?
 
-    public init(register: DependencyRegister, variant: String) {
-        self.register = register
+    public init(container: DependencyContainer, variant: String) {
+        self.container = container
         self.variant = variant
-        register.registerDependencies()
     }
 
-    public init(register: DependencyRegister) {
-        self.register = register
+    public init(container: DependencyContainer) {
+        self.container = container
         self.variant = nil
-        register.registerDependencies()
     }
 
     public init() {
-        self.register = DefaultRegister()
+        self.container = ResolutionContext.global.resolve()
         self.variant = nil
     }
 
     public init(variant: String) {
-        self.register = DefaultRegister()
+        self.container = ResolutionContext.global.resolve()
         self.variant = variant
     }
 
     public var wrappedValue:T {
         get {
-            return self.register.container.resolve(variant: variant) as T
+            return self.container.resolve(variant: variant) as T
         }
         set {
-            self.register.container.store(object: newValue, variant: variant)
-        }
-    }
-
-    private struct DefaultRegister: DependencyRegister {
-        var container: DependencyContainer = ResolutionContext.global.resolve()
-
-        func registerDependencies() {
-            // do nothing
+            self.container.store(object: newValue, variant: variant)
         }
     }
 }
