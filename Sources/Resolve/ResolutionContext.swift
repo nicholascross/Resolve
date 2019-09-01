@@ -8,8 +8,7 @@
 import Foundation
 
 public class ResolutionContext: DependencyContainer {
-
-    private var resolvers: [String:(ResolutionContext)->Any]
+    private var resolvers: [String:()->Any]
     private var storers: [String:(Any)->()]
 
     public static let global = ResolutionContext()
@@ -34,7 +33,7 @@ public class ResolutionContext: DependencyContainer {
         //Use previously registered resolver
 
         //It is not be possible to register a resolver that does not return type 'T'
-        return resolver(self) as! T
+        return resolver() as! T
     }
 
     public func resolve<T>(variant: String? = nil) -> T {
@@ -55,15 +54,7 @@ public class ResolutionContext: DependencyContainer {
         storer(object)
     }
 
-    public func register<T>(variant: String? = nil, resolver: @escaping ()->T) {
-        register(variant: variant, resolver: {_ in resolver() }, storer: {_ in})
-    }
-
-    public func register<T>(variant: String? = nil, resolver: @escaping (ResolutionContext)->T) {
-        register(variant: variant, resolver: resolver, storer: {_ in})
-    }
-
-    public func register<T>(variant: String? = nil, resolver: @escaping (ResolutionContext)->T, storer: @escaping (T)->()) {
+    public func register<T>(variant: String?, resolver: @escaping ()->T, storer: @escaping (T)->()) {
         let key = ResolutionContext.keyName(type:T.self, variant: variant)
 
         guard resolvers[key] == nil else {

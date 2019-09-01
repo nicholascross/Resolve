@@ -16,9 +16,7 @@ public protocol DependencyContainer {
     func tryResolve<T>(variant: String?) throws -> T
     func resolve<T>(variant: String?) -> T
     func store<T>(object: T, variant: String?)
-    func register<T>(variant: String?, resolver: @escaping ()->T)
-    func register<T>(variant: String?, resolver: @escaping (ResolutionContext)->T)
-    func register<T>(variant: String?, resolver: @escaping (ResolutionContext)->T, storer: @escaping (T)->())
+    func register<T>(variant: String?, resolver: @escaping ()->T, storer: @escaping (T)->())
     func removeResolver<T>(for type: T.Type, variant: String?)
     func clearResolvers()
 }
@@ -34,15 +32,11 @@ public extension DependencyContainer {
     }
 
     func register<T>(resolver: @escaping ()->T) {
-        self.register(variant: nil, resolver: resolver)
+        self.register(variant: nil, resolver: resolver, storer: {_ in})
     }
 
-    func register<T>(resolver: @escaping (ResolutionContext)->T) {
-        self.register(variant: nil, resolver: resolver)
-    }
-
-    func register<T>(resolver: @escaping (ResolutionContext)->T, storer: @escaping (T)->()) {
-        self.register(variant: nil, resolver: resolver, storer: storer)
+    func register<T>(variant: String, resolver: @escaping ()->T) {
+        self.register(variant: variant, resolver: resolver, storer: {_ in})
     }
 
     func removeResolver<T>(for type: T.Type) {
