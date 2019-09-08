@@ -11,7 +11,7 @@ public protocol DependencyRegister {
     func registerDependencies(container: DependencyContainer)
 }
 
-public protocol DependencyContainer {
+public protocol DependencyContainer: class {
     func tryResolve<T>(variant: String?) throws -> T
     func resolve<T>(variant: String?) -> T
     func store<T>(object: T, variant: String?)
