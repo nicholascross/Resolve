@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Nicholas Cross on 25/8/19.
-//
-
 import Foundation
 
 public class ResolutionContext: DependencyContainer {

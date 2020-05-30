@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Nicholas Cross on 17/8/19.
-//
-
 import Foundation
 
 @propertyWrapper
