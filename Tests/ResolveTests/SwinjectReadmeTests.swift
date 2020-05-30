@@ -12,6 +12,51 @@ final class SwinjectReadmeTests: XCTestCase {
         let petOwner: Person = context.resolve()
         petOwner.play()
     }
+
+    func testStorage() {
+        class Example {
+
+        }
+
+        class Example2 {
+
+        }
+
+        class Example3 {
+
+        }
+
+        let container = ResolutionContext()
+
+        container.registerAll {
+            persistent { Example() }
+            transient { Example2() }
+            ephemeral { Example3() }
+        }
+
+        var example: Example? = container.resolve() as Example
+        var example2: Example2? = container.resolve() as Example2
+        let example3: Example3 = container.resolve()
+
+        // persistent value is not recreated
+        XCTAssertTrue(example === container.resolve() as Example)
+
+        // persistent value will not be recreated if existing reference is cleared
+        weak var exampleA = example
+        example = nil
+        XCTAssertTrue(exampleA === container.resolve() as Example)
+
+
+        XCTAssertTrue(example2 === container.resolve() as Example2)
+
+        // transient value will be recreated if existing reference is cleared
+        weak var example2a = example2
+        example2 = nil
+        XCTAssertTrue(example2a !== container.resolve() as Example2)
+
+        // ephemeral value is always recreated
+        XCTAssertTrue(example3 !== container.resolve() as Example3)
+    }
 }
 
 protocol Animal {

@@ -53,14 +53,14 @@ Resolving registered dependencies is simple just create add the `@Resolve` prope
 ```
 This will use the default `ResolutionContext` when resolving dependencies.
 
-There can be only one default context; it can be registered as follows
+There can be only one default context; it can be registered as follows.
 
 ```swift
 let context = ResolutionContext()
 context.makeDefault()
 ```
 
-If using a default context is not appropriate for your use case you can include this as part of your property declaration
+If using a default context is not appropriate for your use case you can include this as part of your property declaration.
 
 ```swift
 @Resolve(container: someContext) var pet: Animal
@@ -131,9 +131,9 @@ container.register(variant: "short_date") { () -> DateFormatter in
 @Resolve(variant:"long_date") var formatter: DateFormatter
 ```
 
-### No object lifetime management
+### Object lifetime management
 
-Resolve does not explicitly manage the lifetime of any resolved objects this is left up to the developer.  The above date example would need to be modified in order to prevent a new date formatter being created everytime it was resolved.
+Resolve does not require explicit management of the lifetime of any resolved objects.  The above date example would need to be modified in order to prevent a new date formatter being created everytime it was resolved.
 
 ```swift
 let dateFormatter: DateFormatter = {
@@ -144,6 +144,24 @@ let dateFormatter: DateFormatter = {
 
 context.register(variant: "long_date") { dateFormatter }
 ```
+
+Objects lifetime can be specified explictly using the `registerAll` function.
+
+```swift
+let container = ResolutionContext()
+
+container.registerAll {
+    persistent { Example() }
+    transient { Example2() }
+    ephemeral { Example3() }
+}
+```
+
+- Persistent life time will always resolve the same object
+- Transient life time will resolve the same object provided there is a strong reference to it elsewhere
+- Ephemeral life time will always resolve a new object
+
+> NOTE: This uses a currently private API `@_functionBuilder`.
 
 ### Optional property storage
 
@@ -166,7 +184,7 @@ The above registration will allow the following to property to be used as a sett
 @Resolve(variant:"long_date") var formatter: DateFormatter
 ```
 
-The property can be set directly or via calling the store function on the `ResolutionContext`
+The property can be set directly or via calling the store function on the `ResolutionContext`.
 
 ```swift
 self.formatter = someOtherFormatter
