@@ -115,23 +115,20 @@ let dateFormatter: DateFormatter = {
 context.register(variant: "long_date") { dateFormatter }
 ```
 
-Objects lifetime can be specified explictly using the `registerAll` function.
+Objects lifetime can be specified explictly using the convenience functions `persistent`, `transient`, `ephemeral`.
 
 ```swift
 let container = ResolutionContext()
 
-container.registerAll {
-    persistent { Example() }
-    transient { Example2() }
-    ephemeral { Example3() }
-}
+// persistent life time will always resolve the same object
+container.persistent { Example() }
+
+// transient life time will resolve the same object provided there is a strong reference to it elsewhere
+container.transient { Example2() }
+
+// ephemeral life time will always resolve a new object
+container.ephemeral { Example3() }
 ```
-
-- Persistent life time will always resolve the same object
-- Transient life time will resolve the same object provided there is a strong reference to it elsewhere
-- Ephemeral life time will always resolve a new object
-
-> NOTE: This uses a currently private API `@_functionBuilder`.
 
 ### Optional property storage
 
@@ -160,6 +157,22 @@ The property can be set directly or via calling the store function on the `Resol
 self.formatter = someOtherFormatter
 // OR
 context.store(object: someOtherFormatter, variant: "long_date")
+```
+
+Type variants registered with through the `persistent` or `transient` functions may have thier stored values replaced.
+
+```swift
+let container = ResolutionContext()
+
+let petOwner = container.register { PetOwner() }
+let mimi = container.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
+
+petOwner.play()
+// print: I'm playing with Mimi.
+
+petOwner.pet = Cat(name: "Franky")
+petOwner.play()
+// print: I'm playing with Franky.
 ```
 
 ### Hierarchical registration

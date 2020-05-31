@@ -27,11 +27,9 @@ final class SwinjectReadmeTests: XCTestCase {
 
         let container = ResolutionContext()
 
-        container.registerAll {
-            persistent { Example() }
-            transient { Example2() }
-            ephemeral { Example3() }
-        }
+        container.persistent { Example() }
+        container.transient { Example2() }
+        container.ephemeral { Example3() }
 
         var example: Example? = container.resolve() as Example
         var example2: Example2? = container.resolve() as Example2
