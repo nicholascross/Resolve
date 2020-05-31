@@ -1,26 +1,26 @@
 import Foundation
 
 public class ResolutionContext: DependencyContainer {
-    private var resolvers: [String:()->Any]
-    private var storers: [String:(Any)->()]
+    private var resolvers: [String: () -> Any]
+    private var storers: [String: (Any) -> Void]
 
     private static let containerContext = ResolutionContext()
 
     public init() {
-        self.resolvers = [:]
-        self.storers = [:]
+        resolvers = [:]
+        storers = [:]
     }
 
     public func tryResolve<T>(variant: String? = nil) throws -> T {
-        let key = ResolutionContext.keyName(type:T.self, variant: variant)
+        let key = ResolutionContext.keyName(type: T.self, variant: variant)
 
         guard let resolver = resolvers[key] else {
             throw ResolutionError.missingResolver
         }
 
-        //Use previously registered resolver
+        // Use previously registered resolver
 
-        //It is not be possible to register a resolver that does not return type 'T'
+        // It is not be possible to register a resolver that does not return type 'T'
         return resolver() as! T
     }
 
@@ -42,8 +42,8 @@ public class ResolutionContext: DependencyContainer {
         storer(object)
     }
 
-    public func register<T>(variant: String?, resolver: @escaping ()->T, storer: @escaping (T)->()) {
-        let key = ResolutionContext.keyName(type:T.self, variant: variant)
+    public func register<T>(variant: String?, resolver: @escaping () -> T, storer: @escaping (T) -> Void) {
+        let key = ResolutionContext.keyName(type: T.self, variant: variant)
         let containerKey = ResolutionContext.keyName(type: DependencyContainer.self, variant: key)
 
         guard resolvers[key] == nil else {
@@ -71,8 +71,8 @@ public class ResolutionContext: DependencyContainer {
         }
     }
 
-    public func removeResolver<T>(for type: T.Type, variant: String? = nil) {
-        let key = ResolutionContext.keyName(type:T.self, variant: variant)
+    public func removeResolver<T>(for _: T.Type, variant: String? = nil) {
+        let key = ResolutionContext.keyName(type: T.self, variant: variant)
         resolvers[key] = nil
         storers[key] = nil
     }
@@ -90,12 +90,12 @@ public class ResolutionContext: DependencyContainer {
         containerContext.clearResolvers()
     }
 
-    private static func keyName<T>(type: T.Type, variant: String?) -> String {
+    private static func keyName<T>(type _: T.Type, variant: String?) -> String {
         guard let suffix = variant else {
-            return "\(String(describing:T.self))"
+            return "\(String(describing: T.self))"
         }
 
-        return "\(String(describing:T.self))-\(suffix)"
+        return "\(String(describing: T.self))-\(suffix)"
     }
 }
 

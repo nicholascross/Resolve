@@ -1,8 +1,7 @@
-import XCTest
 @testable import Resolve
+import XCTest
 
 final class ResolveTests: XCTestCase {
-
     var context: DependencyContainer!
 
     override func setUp() {

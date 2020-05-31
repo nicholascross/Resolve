@@ -1,5 +1,5 @@
-import XCTest
 @testable import Resolve
+import XCTest
 
 final class SwinjectReadmeTests: XCTestCase {
     var context: ResolutionContext!
@@ -39,7 +39,7 @@ final class SwinjectReadmeTests: XCTestCase {
 
         class Example {
             // This will resolve expected date formatter
-            @Resolve(variant:"long_date") var formatter: DateFormatter
+            @Resolve(variant: "long_date") var formatter: DateFormatter
         }
     }
 

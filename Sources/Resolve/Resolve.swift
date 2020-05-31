@@ -12,25 +12,25 @@ public struct Resolve<T> {
 
     public init(container: DependencyContainer) {
         self.container = container
-        self.variant = nil
+        variant = nil
     }
 
     public init() {
-        self.container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
-        self.variant = nil
+        container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
+        variant = nil
     }
 
     public init(variant: String) {
-        self.container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
+        container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
         self.variant = variant
     }
 
-    public var wrappedValue:T {
+    public var wrappedValue: T {
         get {
-            return self.container.resolve(variant: variant) as T
+            return container.resolve(variant: variant) as T
         }
         set {
-            self.container.store(object: newValue, variant: variant)
+            container.store(object: newValue, variant: variant)
         }
     }
 }

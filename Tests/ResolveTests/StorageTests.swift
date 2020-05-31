@@ -1,8 +1,7 @@
-import XCTest
 @testable import Resolve
+import XCTest
 
 final class StorageTests: XCTestCase {
-
     var context: ResolutionContext!
 
     override func setUp() {
@@ -45,7 +44,6 @@ final class StorageTests: XCTestCase {
         context.store(object: replacement)
         XCTAssertNil(example2a)
         XCTAssertTrue(replacement === context.resolve() as Example)
-
     }
 
     func testLifetimeEphemeral() {
@@ -60,9 +58,6 @@ final class StorageTests: XCTestCase {
         context.store(object: replacement)
         XCTAssertTrue(replacement !== context.resolve() as Example)
     }
-
 }
 
-private class Example {
-
-}
+private class Example {}
