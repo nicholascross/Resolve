@@ -159,7 +159,7 @@ self.formatter = someOtherFormatter
 context.store(object: someOtherFormatter, variant: "long_date")
 ```
 
-Type variants registered with through the `persistent` or `transient` functions may have thier stored values replaced.
+Type variants registered with the `persistent` or `transient` functions may have thier stored values replaced.
 
 ```swift
 let container = ResolutionContext()
