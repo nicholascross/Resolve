@@ -2,6 +2,12 @@ import XCTest
 @testable import Resolve
 
 final class SwinjectReadmeTests: XCTestCase {
+    var context: ResolutionContext!
+
+    override func setUp() {
+        context = ResolutionContext()
+        ResolutionContext.clearContainerContext()
+    }
 
     func testReadme() {
         let context = ResolutionContext()
@@ -10,53 +16,83 @@ final class SwinjectReadmeTests: XCTestCase {
         context.register { PetOwner() as Person }
         let petOwner: Person = context.resolve()
         petOwner.play()
+        // print: I'm playing with Mimi.
     }
 
-    func testStorage() {
+    func testReadme2() {
+        let context = ResolutionContext()
+        context.register { Cat(name: "Mimi") as Animal }
+    }
+
+    func testReadme3() {
+        context.register(variant: "long_date") { () -> DateFormatter in
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM yyyy"
+            return formatter
+        }
+
+        context.register(variant: "short_date") { () -> DateFormatter in
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd/MM/yyyy"
+            return formatter
+        }
+
         class Example {
-
+            // This will resolve expected date formatter
+            @Resolve(variant:"long_date") var formatter: DateFormatter
         }
+    }
 
-        class Example2 {
+    func testReadme4() {
+        let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM yyyy"
+            return formatter
+        }()
 
-        }
+        context.register(variant: "long_date") { dateFormatter }
+    }
 
-        class Example3 {
+    func testReadme5() {
+        class Example {}
+        class Example2 {}
+        class Example3 {}
 
-        }
+        // persistent life time will always resolve the same object
+        context.persistent { Example() }
 
-        let container = ResolutionContext()
+        // transient life time will resolve the same object provided there is a strong reference to it elsewhere
+        context.transient { Example2() }
 
-        container.persistent { Example() }
-        container.transient { Example2() }
-        container.ephemeral { Example3() }
+        // ephemeral life time will always resolve a new object
+        context.ephemeral { Example3() }
+    }
 
-        var example: Example? = container.resolve() as Example
-        var example2: Example2? = container.resolve() as Example2
-        let example3: Example3 = container.resolve()
+    func testReadme6() {
+        var dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM yyyy"
+            return formatter
+        }()
 
-        // persistent value is not recreated
-        XCTAssertTrue(example === container.resolve() as Example)
+        context.register(variant: "long_date", resolver: { dateFormatter }, storer: { f in dateFormatter = f })
+    }
 
-        // persistent value will not be recreated if existing reference is cleared
-        weak var exampleA = example
-        example = nil
-        XCTAssertTrue(exampleA === container.resolve() as Example)
+    func testReadme7() {
+        context.register { PetOwner() }
+        context.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
 
+        let petOwner: PetOwner = context.resolve()
+        petOwner.play()
+        // print: I'm playing with Mimi.
 
-        XCTAssertTrue(example2 === container.resolve() as Example2)
-
-        // transient value will be recreated if existing reference is cleared
-        weak var example2a = example2
-        example2 = nil
-        XCTAssertTrue(example2a !== container.resolve() as Example2)
-
-        // ephemeral value is always recreated
-        XCTAssertTrue(example3 !== container.resolve() as Example3)
+        petOwner.pet = Cat(name: "Franky")
+        petOwner.play()
+        // print: I'm playing with Franky.
     }
 }
 
-protocol Animal {
+protocol Animal: AnyObject {
     var name: String? { get }
 }
 
@@ -73,7 +109,6 @@ protocol Person {
 }
 
 class PetOwner: Person {
-
     @Resolve(variant: "Mimi") var pet: Animal
 
     func play() {

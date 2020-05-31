@@ -83,13 +83,13 @@ context.removeResolver(for: Person.self)
 As already revealed in the first usage example there can be multiple variants registered for a single type.
 
 ```swift
-container.register(variant: "long_date") { () -> DateFormatter in
+context.register(variant: "long_date") { () -> DateFormatter in
     let formatter = DateFormatter()
     formatter.dateFormat = "MMM yyyy"
     return formatter
 }
 
-container.register(variant: "short_date") { () -> DateFormatter in
+context.register(variant: "short_date") { () -> DateFormatter in
     let formatter = DateFormatter()
     formatter.dateFormat = "dd/MM/yyyy"
     return formatter
@@ -118,16 +118,14 @@ context.register(variant: "long_date") { dateFormatter }
 Objects lifetime can be specified explictly using the convenience functions `persistent`, `transient`, `ephemeral`.
 
 ```swift
-let container = ResolutionContext()
-
 // persistent life time will always resolve the same object
-container.persistent { Example() }
+context.persistent { Example() }
 
 // transient life time will resolve the same object provided there is a strong reference to it elsewhere
-container.transient { Example2() }
+context.transient { Example2() }
 
 // ephemeral life time will always resolve a new object
-container.ephemeral { Example3() }
+context.ephemeral { Example3() }
 ```
 
 ### Optional property storage
@@ -162,10 +160,8 @@ context.store(object: someOtherFormatter, variant: "long_date")
 Type variants registered with the `persistent` or `transient` functions may have thier stored values replaced.
 
 ```swift
-let container = ResolutionContext()
-
-let petOwner = container.register { PetOwner() }
-let mimi = container.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
+let petOwner = context.register { PetOwner() }
+let mimi = context.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
 
 petOwner.play()
 // print: I'm playing with Mimi.
@@ -182,7 +178,6 @@ When registering a type conforming to `DependencyRegister` protocol the `registe
 This allows the distribution of dependency registration through out the application in hierarchical manner, as one register may register another whilst in turn registering its own dependencies.
 
 ```swift
-
 final class ExampleRegister: DependencyRegister {
     func registerDependencies(container: DependencyContainer) {
         container.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }

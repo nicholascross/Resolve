@@ -86,6 +86,10 @@ public class ResolutionContext: DependencyContainer {
         return containerContext.resolve(variant: keyName(type: type, variant: variant))
     }
 
+    static func clearContainerContext() {
+        containerContext.clearResolvers()
+    }
+
     private static func keyName<T>(type: T.Type, variant: String?) -> String {
         guard let suffix = variant else {
             return "\(String(describing:T.self))"
