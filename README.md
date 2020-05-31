@@ -72,16 +72,6 @@ context.register { Cat(name: "Mimi") as Animal }
 
 There can be only a single registration for a given type variant this allows the default registrations to be ignored which might be useful for testing purposes.  Earlier registration of mock/stub objects will take precedence allowing you to provide alternate implementation for testing purposes.
 
-```swift
-let context = ResolutionContext()
-
-container.register(variant: "Mimi") { Cat(name: "Betsy") as Animal }
-
-let petOwner: Person = context.resolve()
-petOwner.play()
-//print: I'm playing with Betsy.
-```
-
 If an alternate registration is truly required the old registration can be removed and a new one registered.
 
 ```swift
@@ -90,7 +80,7 @@ context.removeResolver(for: Person.self)
 
 ### Variant resolution
 
-As already revealed in some of the above examples there can be multiple variants registered for a single type.
+As already revealed in the first usage example there can be multiple variants registered for a single type.
 
 ```swift
 container.register(variant: "long_date") { () -> DateFormatter in
