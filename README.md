@@ -33,69 +33,49 @@ class PetOwner: Person {
 }
 
 let context = ResolutionContext()
-context.makeDefault()
 
 context.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
 context.register { PetOwner() as Person }
 let petOwner: Person = context.resolve()
 petOwner.play()
-//print: I'm playing with Mimi.
+// print: I'm playing with Mimi.
 ```
 
 ## What can Resolve do?
 
 ### @Resolve property wrapper
 
-Resolving registered dependencies is simple just create add the `@Resolve` property wrapper in front of your property.
+Resolving registered dependencies is simple just add the `@Resolve` property wrapper in front of your property.
 
 ```swift
 @Resolve var pet: Animal
 ```
-This will use the default `ResolutionContext` when resolving dependencies.
 
-There can be only one default context; it can be registered as follows.
+This will find the first  `ResolutionContext` that registered this type to resolve the value.
 
-```swift
-let context = ResolutionContext()
-context.makeDefault()
-```
-
-If using a default context is not appropriate for your use case you can include this as part of your property declaration.
+If using a single `ResolutionContext` per type variant is not appropriate for your use case you can include this as part of your property declaration.
 
 ```swift
 @Resolve(container: someContext) var pet: Animal
 ```
 
-### Distributed registration
+### Type registration
 
-When registering a type conforming to `DependencyRegister` protocol the `registerDependencies` function will be called giving you an opportunity to register any further dependencies.
+Before the above will work there must be a defined way to resolve the object that will be returned.  This is done by registering a closure that returns the type to be resolved.
 
-This allows you to easily distribute the registration of dependency through out your app rather than centralising in a single place.
+Note the casting to `Animal`, this is allows registration of a new `Cat` instance any time we resolve the `Animal` type.  
 
 ```swift
 let context = ResolutionContext()
-context.makeDefault()
-context.register { ExampleObject() }
-
-final class ExampleObject: DependencyRegister {
-    func registerDependencies(container: DependencyContainer) {
-        container.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
-        container.register { PetOwner() as Person }
-    }
-}
-
-let petOwner: Person = context.resolve()
-petOwner.play()
-//print: I'm playing with Mimi.
+context.register { Cat(name: "Mimi") as Animal }
 ```
 
-There can be only a single registration for given type variant this allows the default registrations to be ignored which might be useful for testing purposes.  Earlier registration of mock/stub objects will take precedence allowing you to provide alternate implementation for testing purposes.
+There can be only a single registration for a given type variant this allows the default registrations to be ignored which might be useful for testing purposes.  Earlier registration of mock/stub objects will take precedence allowing you to provide alternate implementation for testing purposes.
 
 ```swift
 let context = ResolutionContext()
-context.makeDefault()
+
 container.register(variant: "Mimi") { Cat(name: "Betsy") as Animal }
-context.register { ExampleObject() }
 
 let petOwner: Person = context.resolve()
 petOwner.play()
@@ -190,4 +170,27 @@ The property can be set directly or via calling the store function on the `Resol
 self.formatter = someOtherFormatter
 // OR
 context.store(object: someOtherFormatter, variant: "long_date")
+```
+
+### Hierarchical registration
+
+When registering a type conforming to `DependencyRegister` protocol the `registerDependencies` function will be called giving you an opportunity to register any further dependencies.
+
+This allows the distribution of dependency registration through out the application in hierarchical manner, as one register may register another whilst in turn registering its own dependencies.
+
+```swift
+
+final class ExampleRegister: DependencyRegister {
+    func registerDependencies(container: DependencyContainer) {
+        container.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
+        container.register { PetOwner() as Person }
+    }
+}
+
+let context = ResolutionContext()
+context.register { ExampleObject() }
+
+let petOwner: Person = context.resolve()
+petOwner.play()
+// print: I'm playing with Mimi.
 ```

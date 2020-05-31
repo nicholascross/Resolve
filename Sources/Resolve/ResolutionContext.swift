@@ -4,16 +4,11 @@ public class ResolutionContext: DependencyContainer {
     private var resolvers: [String:()->Any]
     private var storers: [String:(Any)->()]
 
-    public static let global = ResolutionContext()
+    private static let containerContext = ResolutionContext()
 
     public init() {
         self.resolvers = [:]
         self.storers = [:]
-    }
-
-    public func makeDefault() {
-        // @Resolve will now internally use this context when no other is specified
-        ResolutionContext.global.register { self as DependencyContainer }
     }
 
     public func tryResolve<T>(variant: String? = nil) throws -> T {
@@ -49,6 +44,7 @@ public class ResolutionContext: DependencyContainer {
 
     public func register<T>(variant: String?, resolver: @escaping ()->T, storer: @escaping (T)->()) {
         let key = ResolutionContext.keyName(type:T.self, variant: variant)
+        let containerKey = ResolutionContext.keyName(type: DependencyContainer.self, variant: key)
 
         guard resolvers[key] == nil else {
             // Already has registered resolver
@@ -57,6 +53,15 @@ public class ResolutionContext: DependencyContainer {
 
         resolvers[key] = resolver
         storers[key] = { storer($0 as! T) }
+
+        // multiple containers for a single type variant cannot be automatically
+        // resolved, only the first container registered will be used
+        if !ResolutionContext.containerContext.resolvers.keys.contains(containerKey) {
+            // global registration of the container used to resolve this type
+            // this allows usage of @Resolve property wrapper without specification
+            // of the container to be used when resolving
+            ResolutionContext.containerContext.resolvers[containerKey] = { self as DependencyContainer }
+        }
 
         // Registering a dependency register will trigger
         // the registration of the registers dependencies
@@ -75,6 +80,10 @@ public class ResolutionContext: DependencyContainer {
     public func clearResolvers() {
         resolvers = [:]
         storers = [:]
+    }
+
+    static func resolveContainer<T>(type: T.Type, variant: String?) -> DependencyContainer {
+        return containerContext.resolve(variant: keyName(type: type, variant: variant))
     }
 
     private static func keyName<T>(type: T.Type, variant: String?) -> String {

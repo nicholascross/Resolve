@@ -5,7 +5,6 @@ final class SwinjectReadmeTests: XCTestCase {
 
     func testReadme() {
         let context = ResolutionContext()
-        context.makeDefault()
 
         context.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
         context.register { PetOwner() as Person }
