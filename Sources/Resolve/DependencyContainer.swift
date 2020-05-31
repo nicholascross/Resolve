@@ -35,7 +35,7 @@ public extension DependencyContainer {
         self.removeResolver(for: type, variant: nil)
     }
 
-    func persistent<Type>(variant: String? = nil, _ factory: @escaping () -> Type) {
+    func persistent<Type>(variant: String? = nil, factory: @escaping () -> Type) {
         var object: Type?
 
         let resolver: () -> Type = {
@@ -52,24 +52,25 @@ public extension DependencyContainer {
         register(variant: variant, resolver: resolver, storer: storer)
     }
 
-    func transient<Type: AnyObject>(variant: String? = nil, _ factory: @escaping () -> Type) {
-        weak var object: Type?
+    func transient<Type>(variant: String? = nil, factory: @escaping () -> Type) {
+        weak var object: AnyObject?
 
         let resolver: () -> Type = {
             guard let stored = object else {
                 let newObject = factory()
-                object = newObject
+                object = newObject as AnyObject
                 return newObject
             }
-            return stored
+
+            return stored as! Type
         }
 
-        let storer: (Type) -> () = { object = $0 }
+        let storer: (Type) -> () = { object = $0 as AnyObject }
 
         register(variant: variant, resolver: resolver, storer: storer)
     }
 
-    func ephemeral<Type>(variant: String? = nil, _ factory: @escaping () -> Type) {
+    func ephemeral<Type>(variant: String? = nil, factory: @escaping () -> Type) {
         register(variant: variant, resolver: factory, storer: { _ in })
     }
 
