@@ -7,6 +7,18 @@ A swift package to support dependency resolution with property wrapper support f
 This is how you would do something similar to [Swinject basic usage](https://github.com/Swinject/Swinject#basic-usage)
 
 ```swift
+let context = ResolutionContext()
+
+context.register { Cat(name: "Mimi") as Animal }
+context.register { PetOwner() as Person }
+let petOwner: Person = context.resolve()
+petOwner.play()
+// print: I'm playing with Mimi.
+```
+
+Where the types are defined as follows.
+
+```swift
 protocol Animal {
     var name: String? { get }
 }
@@ -24,21 +36,13 @@ protocol Person {
 }
 
 class PetOwner: Person {
-    @Resolve(variant: "Mimi") var pet: Animal
+    @Resolve var pet: Animal
 
     func play() {
         let name = pet.name ?? "someone"
         print("I'm playing with \(name).")
     }
 }
-
-let context = ResolutionContext()
-
-context.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
-context.register { PetOwner() as Person }
-let petOwner: Person = context.resolve()
-petOwner.play()
-// print: I'm playing with Mimi.
 ```
 
 ## What can Resolve do?
@@ -80,7 +84,7 @@ context.removeResolver(for: Person.self)
 
 ### Variant resolution
 
-As already revealed in the first usage example there can be multiple variants registered for a single type.
+There can be multiple variants registered for a single type.
 
 ```swift
 context.register(variant: "long_date") { () -> DateFormatter in
