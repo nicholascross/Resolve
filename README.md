@@ -7,7 +7,7 @@ A swift package to support dependency resolution with property wrapper support f
 This is how you would do something similar to [Swinject basic usage](https://github.com/Swinject/Swinject#basic-usage)
 
 ```swift
-let context = ResolutionContext()
+let context = DependencyResolver()
 
 context.register { Cat(name: "Mimi") as Animal }
 context.register { PetOwner() as Person }
@@ -55,9 +55,9 @@ Resolving registered dependencies is simple just add the `@Resolve` property wra
 @Resolve var pet: Animal
 ```
 
-This will find the first  `ResolutionContext` that registered this type to resolve the value.
+This will find the first  `DependencyResolver` that registered this type to resolve the value.
 
-If using a single `ResolutionContext` per type variant is not appropriate for your use case you can include this as part of your property declaration.
+If using a single `DependencyResolver` per type variant is not appropriate for your use case you can include this as part of your property declaration.
 
 ```swift
 @Resolve(container: someContext) var pet: Animal
@@ -70,7 +70,7 @@ Before the above will work there must be a defined way to resolve the object tha
 Note the casting to `Animal`, this is allows registration of a new `Cat` instance any time we resolve the `Animal` type.  
 
 ```swift
-let context = ResolutionContext()
+let context = DependencyResolver()
 context.register { Cat(name: "Mimi") as Animal }
 ```
 
@@ -153,7 +153,7 @@ The above registration will allow the following to property to be used as a sett
 @Resolve(variant:"long_date") var formatter: DateFormatter
 ```
 
-The property can be set directly or via calling the store function on the `ResolutionContext`.
+The property can be set directly or via calling the store function on the `DependencyResolver`.
 
 ```swift
 self.formatter = someOtherFormatter
@@ -189,7 +189,7 @@ final class ExampleRegister: DependencyRegister {
     }
 }
 
-let context = ResolutionContext()
+let context = DependencyResolver()
 context.register { ExampleObject() }
 
 let petOwner: Person = context.resolve()

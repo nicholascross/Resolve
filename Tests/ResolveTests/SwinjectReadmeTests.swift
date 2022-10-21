@@ -2,15 +2,15 @@
 import XCTest
 
 final class SwinjectReadmeTests: XCTestCase {
-    var context: ResolutionContext!
+    var context: DependencyResolver!
 
     override func setUp() {
-        context = ResolutionContext()
-        ResolutionContext.clearContainerContext()
+        context = DependencyResolver()
+        DependencyResolver.clearContainerContext()
     }
 
     func testReadme() {
-        let context = ResolutionContext()
+        let context = DependencyResolver()
 
         context.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
         context.register { PetOwner() as Person }
@@ -20,7 +20,7 @@ final class SwinjectReadmeTests: XCTestCase {
     }
 
     func testReadme2() {
-        let context = ResolutionContext()
+        let context = DependencyResolver()
         context.register { Cat(name: "Mimi") as Animal }
     }
 

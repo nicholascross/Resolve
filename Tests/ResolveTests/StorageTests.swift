@@ -2,11 +2,11 @@
 import XCTest
 
 final class StorageTests: XCTestCase {
-    var context: ResolutionContext!
+    var context: DependencyResolver!
 
     override func setUp() {
-        context = ResolutionContext()
-        ResolutionContext.clearContainerContext()
+        context = DependencyResolver()
+        DependencyResolver.clearContainerContext()
     }
 
     func testLifetimePersistent() {

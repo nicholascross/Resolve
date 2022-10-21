@@ -16,12 +16,12 @@ public struct Resolve<T> {
     }
 
     public init() {
-        container = ResolutionContext()
+        container = DependencyResolver()
         variant = nil
     }
 
     public init(variant: String) {
-        container = ResolutionContext()
+        container = DependencyResolver()
         self.variant = variant
     }
 

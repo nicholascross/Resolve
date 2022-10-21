@@ -5,8 +5,8 @@ final class ResolveTests: XCTestCase {
     var context: DependencyContainer!
 
     override func setUp() {
-        context = ResolutionContext()
-        ResolutionContext.clearContainerContext()
+        context = DependencyResolver()
+        DependencyResolver.clearContainerContext()
         Example2.context.clearResolvers()
 
         context.transient(variant: "number") { TestExample() }
@@ -74,7 +74,7 @@ private class TestExample {
 }
 
 private class Example2 {
-    static let context: DependencyContainer = ResolutionContext()
+    static let context: DependencyContainer = DependencyResolver()
 
     @Resolve(container: Example2.context) var test: TestExample
     @Resolve(container: Example2.context, variant: "number") var test2: TestExample
