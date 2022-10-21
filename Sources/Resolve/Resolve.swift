@@ -16,12 +16,12 @@ public struct Resolve<T> {
     }
 
     public init() {
-        container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
+        container = ResolutionContext()
         variant = nil
     }
 
     public init(variant: String) {
-        container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
+        container = ResolutionContext()
         self.variant = variant
     }
 

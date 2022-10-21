@@ -4,10 +4,10 @@ public protocol DependencyRegister {
     func registerDependencies(container: DependencyContainer)
 }
 
-public protocol DependencyContainer: class {
-    func tryResolve<T>(variant: String?) throws -> T
+public protocol DependencyContainer: AnyObject {
+    func tryResolve<T>(variant: String?, useGlobalContainers: Bool) throws -> T
     func resolve<T>(variant: String?) -> T
-    func store<T>(object: T, variant: String?)
+    func store<T>(object: T, variant: String?, useGlobalContainers: Bool)
     func register<T>(variant: String?, resolver: @escaping () -> T, storer: @escaping (T) -> Void)
     func removeResolver<T>(for type: T.Type, variant: String?)
     func clearResolvers()
@@ -19,9 +19,17 @@ public extension DependencyContainer {
     }
 
     func store<T>(object: T) {
-        store(object: object, variant: nil)
+        store(object: object, variant: nil, useGlobalContainers: true)
     }
-
+    
+    func store<T>(object: T, variant: String?) {
+        store(object: object, variant: variant, useGlobalContainers: true)
+    }
+    
+    func tryResolve<T>(variant: String?) throws -> T {
+        try tryResolve(variant: variant, useGlobalContainers: true)
+    }
+    
     func register<T>(resolver: @escaping () -> T) {
         register(variant: nil, resolver: resolver, storer: { _ in })
     }

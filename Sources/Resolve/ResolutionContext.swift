@@ -11,10 +11,17 @@ public class ResolutionContext: DependencyContainer {
         storers = [:]
     }
 
-    public func tryResolve<T>(variant: String? = nil) throws -> T {
+    public func tryResolve<T>(variant: String? = nil, useGlobalContainers: Bool = true) throws -> T {
         let key = ResolutionContext.keyName(type: T.self, variant: variant)
-
+        let containerKey = ResolutionContext.keyName(type: DependencyContainer.self, variant: key)
+        
         guard let resolver = resolvers[key] else {
+            if useGlobalContainers,
+               ResolutionContext.containerContext.resolvers.keys.contains(containerKey) {
+                let container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
+                return try container.tryResolve(variant: variant, useGlobalContainers: false)
+            }
+            
             throw ResolutionError.missingResolver
         }
 
@@ -32,9 +39,17 @@ public class ResolutionContext: DependencyContainer {
         return resolved
     }
 
-    public func store<T>(object: T, variant: String? = nil) {
+    public func store<T>(object: T, variant: String? = nil, useGlobalContainers: Bool = true) {
         let key = ResolutionContext.keyName(type: T.self, variant: variant)
+        let containerKey = ResolutionContext.keyName(type: DependencyContainer.self, variant: key)
 
+        if useGlobalContainers,
+           ResolutionContext.containerContext.resolvers.keys.contains(containerKey) {
+            let container = ResolutionContext.resolveContainer(type: T.self, variant: variant)
+            container.store(object: object, variant: variant, useGlobalContainers: false)
+            return
+        }
+        
         guard let storer = storers[key] else {
             return
         }
@@ -82,7 +97,7 @@ public class ResolutionContext: DependencyContainer {
         storers = [:]
     }
 
-    static func resolveContainer<T>(type: T.Type, variant: String?) -> DependencyContainer {
+    private static func resolveContainer<T>(type: T.Type, variant: String?) -> DependencyContainer {
         return containerContext.resolve(variant: keyName(type: type, variant: variant))
     }
 
