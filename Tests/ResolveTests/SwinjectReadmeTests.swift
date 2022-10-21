@@ -6,7 +6,7 @@ final class SwinjectReadmeTests: XCTestCase {
 
     override func setUp() {
         context = DependencyResolver()
-        DependencyResolver.clearContainerContext()
+        DependencyResolver.clearResolvers()
     }
 
     func testReadme() {

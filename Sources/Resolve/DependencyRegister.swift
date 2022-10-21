@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol DependencyRegister {
-    func registerDependencies(container: Resolver)
+    func registerDependencies(resolver: Resolver)
 }

@@ -2,35 +2,35 @@ import Foundation
 
 @propertyWrapper
 public struct Resolve<T> {
-    private var container: Resolver
+    private var resolver: Resolver
     private var variant: String?
 
-    public init(container: Resolver, variant: String) {
-        self.container = container
+    public init(resolver: Resolver, variant: String) {
+        self.resolver = resolver
         self.variant = variant
     }
 
-    public init(container: Resolver) {
-        self.container = container
+    public init(resolver: Resolver) {
+        self.resolver = resolver
         variant = nil
     }
 
     public init() {
-        container = DependencyResolver()
+        resolver = DependencyResolver()
         variant = nil
     }
 
     public init(variant: String) {
-        container = DependencyResolver()
+        resolver = DependencyResolver()
         self.variant = variant
     }
 
     public var wrappedValue: T {
         get {
-            return container.resolve(variant: variant) as T
+            return resolver.resolve(variant: variant) as T
         }
         set {
-            container.store(object: newValue, variant: variant)
+            resolver.store(object: newValue, variant: variant)
         }
     }
 }

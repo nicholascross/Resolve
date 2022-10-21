@@ -60,7 +60,7 @@ This will find the first  `DependencyResolver` that registered this type to reso
 If using a single `DependencyResolver` per type variant is not appropriate for your use case you can include this as part of your property declaration.
 
 ```swift
-@Resolve(container: someContext) var pet: Animal
+@Resolve(resolver: someContext) var pet: Animal
 ```
 
 ### Type registration
@@ -183,9 +183,9 @@ This allows the distribution of dependency registration through out the applicat
 
 ```swift
 final class ExampleRegister: DependencyRegister {
-    func registerDependencies(container: Resolver) {
-        container.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
-        container.register { PetOwner() as Person }
+    func registerDependencies(resolver: Resolver) {
+        resolver.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
+        resolver.register { PetOwner() as Person }
     }
 }
 
