@@ -22,7 +22,7 @@ public class DependencyResolver: Resolver {
                 return try container.tryResolve(variant: variant, useGlobalContainers: false)
             }
             
-            throw ResolutionError.missingResolver
+            throw DependencyResolverError.missingResolver
         }
 
         // Use previously registered resolver
@@ -112,8 +112,4 @@ public class DependencyResolver: Resolver {
 
         return "\(String(describing: T.self))-\(suffix)"
     }
-}
-
-public enum ResolutionError: Error {
-    case missingResolver
 }
