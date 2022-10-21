@@ -2,7 +2,7 @@
 import XCTest
 
 final class ResolveTests: XCTestCase {
-    var context: DependencyContainer!
+    var context: Resolver!
 
     override func setUp() {
         context = DependencyResolver()
@@ -74,7 +74,7 @@ private class TestExample {
 }
 
 private class Example2 {
-    static let context: DependencyContainer = DependencyResolver()
+    static let context: Resolver = DependencyResolver()
 
     @Resolve(container: Example2.context) var test: TestExample
     @Resolve(container: Example2.context, variant: "number") var test2: TestExample

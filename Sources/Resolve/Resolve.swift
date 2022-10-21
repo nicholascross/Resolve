@@ -2,15 +2,15 @@ import Foundation
 
 @propertyWrapper
 public struct Resolve<T> {
-    private var container: DependencyContainer
+    private var container: Resolver
     private var variant: String?
 
-    public init(container: DependencyContainer, variant: String) {
+    public init(container: Resolver, variant: String) {
         self.container = container
         self.variant = variant
     }
 
-    public init(container: DependencyContainer) {
+    public init(container: Resolver) {
         self.container = container
         variant = nil
     }

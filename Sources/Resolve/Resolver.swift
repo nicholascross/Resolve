@@ -1,10 +1,10 @@
 import Foundation
 
 public protocol DependencyRegister {
-    func registerDependencies(container: DependencyContainer)
+    func registerDependencies(container: Resolver)
 }
 
-public protocol DependencyContainer: AnyObject {
+public protocol Resolver: AnyObject {
     func tryResolve<T>(variant: String?, useGlobalContainers: Bool) throws -> T
     func resolve<T>(variant: String?) -> T
     func store<T>(object: T, variant: String?, useGlobalContainers: Bool)
@@ -13,7 +13,7 @@ public protocol DependencyContainer: AnyObject {
     func clearResolvers()
 }
 
-public extension DependencyContainer {
+public extension Resolver {
     func resolve<T>() -> T {
         resolve(variant: nil)
     }

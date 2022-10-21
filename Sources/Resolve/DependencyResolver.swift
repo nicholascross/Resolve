@@ -1,6 +1,6 @@
 import Foundation
 
-public class DependencyResolver: DependencyContainer {
+public class DependencyResolver: Resolver {
     private var resolvers: [String: () -> Any]
     private var storers: [String: (Any) -> Void]
 
@@ -13,7 +13,7 @@ public class DependencyResolver: DependencyContainer {
 
     public func tryResolve<T>(variant: String? = nil, useGlobalContainers: Bool = true) throws -> T {
         let key = DependencyResolver.keyName(type: T.self, variant: variant)
-        let containerKey = DependencyResolver.keyName(type: DependencyContainer.self, variant: key)
+        let containerKey = DependencyResolver.keyName(type: Resolver.self, variant: key)
         
         guard let resolver = resolvers[key] else {
             if useGlobalContainers,
@@ -41,7 +41,7 @@ public class DependencyResolver: DependencyContainer {
 
     public func store<T>(object: T, variant: String? = nil, useGlobalContainers: Bool = true) {
         let key = DependencyResolver.keyName(type: T.self, variant: variant)
-        let containerKey = DependencyResolver.keyName(type: DependencyContainer.self, variant: key)
+        let containerKey = DependencyResolver.keyName(type: Resolver.self, variant: key)
 
         if useGlobalContainers,
            DependencyResolver.containerContext.resolvers.keys.contains(containerKey) {
@@ -59,7 +59,7 @@ public class DependencyResolver: DependencyContainer {
 
     public func register<T>(variant: String?, resolver: @escaping () -> T, storer: @escaping (T) -> Void) {
         let key = DependencyResolver.keyName(type: T.self, variant: variant)
-        let containerKey = DependencyResolver.keyName(type: DependencyContainer.self, variant: key)
+        let containerKey = DependencyResolver.keyName(type: Resolver.self, variant: key)
 
         guard resolvers[key] == nil else {
             // Already has registered resolver
@@ -75,7 +75,7 @@ public class DependencyResolver: DependencyContainer {
             // global registration of the container used to resolve this type
             // this allows usage of @Resolve property wrapper without specification
             // of the container to be used when resolving
-            DependencyResolver.containerContext.resolvers[containerKey] = { self as DependencyContainer }
+            DependencyResolver.containerContext.resolvers[containerKey] = { self as Resolver }
         }
 
         // Registering a dependency register will trigger
@@ -97,7 +97,7 @@ public class DependencyResolver: DependencyContainer {
         storers = [:]
     }
 
-    private static func resolveContainer<T>(type: T.Type, variant: String?) -> DependencyContainer {
+    private static func resolveContainer<T>(type: T.Type, variant: String?) -> Resolver {
         return containerContext.resolve(variant: keyName(type: type, variant: variant))
     }
 

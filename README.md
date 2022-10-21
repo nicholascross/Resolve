@@ -183,7 +183,7 @@ This allows the distribution of dependency registration through out the applicat
 
 ```swift
 final class ExampleRegister: DependencyRegister {
-    func registerDependencies(container: DependencyContainer) {
+    func registerDependencies(container: Resolver) {
         container.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
         container.register { PetOwner() as Person }
     }
