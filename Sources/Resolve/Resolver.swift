@@ -1,9 +1,5 @@
 import Foundation
 
-public protocol DependencyRegister {
-    func registerDependencies(container: Resolver)
-}
-
 public protocol Resolver: AnyObject {
     func tryResolve<T>(variant: String?, useGlobalContainers: Bool) throws -> T
     func resolve<T>(variant: String?) -> T
