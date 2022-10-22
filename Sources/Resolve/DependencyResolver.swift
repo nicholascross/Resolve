@@ -101,7 +101,7 @@ public class DependencyResolver: Resolver {
         return resolver.resolve(variant: keyName(type: type, variant: variant))
     }
 
-    static func clearResolvers() {
+    public static func clearResolvers() {
         resolver.clearResolvers()
     }
 
