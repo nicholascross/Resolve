@@ -7,11 +7,11 @@ A swift package to support dependency resolution with property wrapper support f
 This is how you would do something similar to [Swinject basic usage](https://github.com/Swinject/Swinject#basic-usage)
 
 ```swift
-let context = DependencyResolver()
+let resolver = DependencyResolver()
 
-context.register { Cat(name: "Mimi") as Animal }
-context.register { PetOwner() as Person }
-let petOwner: Person = context.resolve()
+resolver.register { Cat(name: "Mimi") as Animal }
+resolver.register { PetOwner() as Person }
+let petOwner: Person = resolver.resolve()
 petOwner.play()
 // print: I'm playing with Mimi.
 ```
@@ -70,8 +70,8 @@ Before the above will work there must be a defined way to resolve the object tha
 Note the casting to `Animal`, this is allows registration of a new `Cat` instance any time we resolve the `Animal` type.  
 
 ```swift
-let context = DependencyResolver()
-context.register { Cat(name: "Mimi") as Animal }
+let resolver = DependencyResolver()
+resolver.register { Cat(name: "Mimi") as Animal }
 ```
 
 There can be only a single registration for a given type variant this allows the default registrations to be ignored which might be useful for testing purposes.  Earlier registration of mock/stub objects will take precedence allowing you to provide alternate implementation for testing purposes.
@@ -79,7 +79,7 @@ There can be only a single registration for a given type variant this allows the
 If an alternate registration is truly required the old registration can be removed and a new one registered.
 
 ```swift
-context.removeResolver(for: Person.self)
+resolver.removeResolver(for: Person.self)
 ```
 
 ### Variant resolution
@@ -87,13 +87,13 @@ context.removeResolver(for: Person.self)
 There can be multiple variants registered for a single type.
 
 ```swift
-context.register(variant: "long_date") { () -> DateFormatter in
+resolver.register(variant: "long_date") { () -> DateFormatter in
     let formatter = DateFormatter()
     formatter.dateFormat = "MMM yyyy"
     return formatter
 }
 
-context.register(variant: "short_date") { () -> DateFormatter in
+resolver.register(variant: "short_date") { () -> DateFormatter in
     let formatter = DateFormatter()
     formatter.dateFormat = "dd/MM/yyyy"
     return formatter
@@ -116,20 +116,20 @@ let dateFormatter: DateFormatter = {
     return formatter
 }()
 
-context.register(variant: "long_date") { dateFormatter }
+resolver.register(variant: "long_date") { dateFormatter }
 ```
 
 Objects lifetime can be specified explictly using the convenience functions `persistent`, `transient`, `ephemeral`.
 
 ```swift
 // persistent life time will always resolve the same object
-context.persistent { Example() }
+resolver.persistent { Example() }
 
 // transient life time will resolve the same object provided there is a strong reference to it elsewhere
-context.transient { Example2() }
+resolver.transient { Example2() }
 
 // ephemeral life time will always resolve a new object
-context.ephemeral { Example3() }
+resolver.ephemeral { Example3() }
 ```
 
 ### Optional property storage
@@ -143,7 +143,7 @@ var dateFormatter: DateFormatter = {
     return formatter
 }()
 
-context.register(variant: "long_date", resolver: { dateFormatter }, storer: { f in dateFormatter = f })
+resolver.register(variant: "long_date", resolver: { dateFormatter }, storer: { f in dateFormatter = f })
 ```
 
 The above registration will allow the following to property to be used as a setter as well.
@@ -158,14 +158,14 @@ The property can be set directly or via calling the store function on the `Depen
 ```swift
 self.formatter = someOtherFormatter
 // OR
-context.store(object: someOtherFormatter, variant: "long_date")
+resolver.store(object: someOtherFormatter, variant: "long_date")
 ```
 
 Type variants registered with the `persistent` or `transient` functions may have thier stored values replaced.
 
 ```swift
-let petOwner = context.register { PetOwner() }
-let mimi = context.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
+let petOwner = resolver.register { PetOwner() }
+let mimi = resolver.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
 
 petOwner.play()
 // print: I'm playing with Mimi.
@@ -189,10 +189,10 @@ final class ExampleRegister: DependencyRegister {
     }
 }
 
-let context = DependencyResolver()
-context.register { ExampleObject() }
+let resolver = DependencyResolver()
+resolver.register { ExampleObject() }
 
-let petOwner: Person = context.resolve()
+let petOwner: Person = resolver.resolve()
 petOwner.play()
 // print: I'm playing with Mimi.
 ```

@@ -2,36 +2,36 @@
 import XCTest
 
 final class SwinjectReadmeTests: XCTestCase {
-    var context: DependencyResolver!
+    var resolver: DependencyResolver!
 
     override func setUp() {
-        context = DependencyResolver()
+        resolver = DependencyResolver()
         DependencyResolver.clearResolvers()
     }
 
     func testReadme() {
-        let context = DependencyResolver()
+        let resolver = DependencyResolver()
 
-        context.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
-        context.register { PetOwner() as Person }
-        let petOwner: Person = context.resolve()
+        resolver.register(variant: "Mimi") { Cat(name: "Mimi") as Animal }
+        resolver.register { PetOwner() as Person }
+        let petOwner: Person = resolver.resolve()
         petOwner.play()
         // print: I'm playing with Mimi.
     }
 
     func testReadme2() {
-        let context = DependencyResolver()
-        context.register { Cat(name: "Mimi") as Animal }
+        let resolver = DependencyResolver()
+        resolver.register { Cat(name: "Mimi") as Animal }
     }
 
     func testReadme3() {
-        context.register(variant: "long_date") { () -> DateFormatter in
+        resolver.register(variant: "long_date") { () -> DateFormatter in
             let formatter = DateFormatter()
             formatter.dateFormat = "MMM yyyy"
             return formatter
         }
 
-        context.register(variant: "short_date") { () -> DateFormatter in
+        resolver.register(variant: "short_date") { () -> DateFormatter in
             let formatter = DateFormatter()
             formatter.dateFormat = "dd/MM/yyyy"
             return formatter
@@ -50,7 +50,7 @@ final class SwinjectReadmeTests: XCTestCase {
             return formatter
         }()
 
-        context.register(variant: "long_date") { dateFormatter }
+        resolver.register(variant: "long_date") { dateFormatter }
     }
 
     func testReadme5() {
@@ -59,13 +59,13 @@ final class SwinjectReadmeTests: XCTestCase {
         class Example3 {}
 
         // persistent life time will always resolve the same object
-        context.persistent { Example() }
+        resolver.persistent { Example() }
 
         // transient life time will resolve the same object provided there is a strong reference to it elsewhere
-        context.transient { Example2() }
+        resolver.transient { Example2() }
 
         // ephemeral life time will always resolve a new object
-        context.ephemeral { Example3() }
+        resolver.ephemeral { Example3() }
     }
 
     func testReadme6() {
@@ -75,14 +75,14 @@ final class SwinjectReadmeTests: XCTestCase {
             return formatter
         }()
 
-        context.register(variant: "long_date", resolver: { dateFormatter }, storer: { f in dateFormatter = f })
+        resolver.register(variant: "long_date", resolver: { dateFormatter }, storer: { f in dateFormatter = f })
     }
 
     func testReadme7() {
-        context.register { PetOwner() }
-        context.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
+        resolver.register { PetOwner() }
+        resolver.transient(variant: "Mimi") { Cat(name: "Mimi") as Animal }
 
-        let petOwner: PetOwner = context.resolve()
+        let petOwner: PetOwner = resolver.resolve()
         petOwner.play()
         // print: I'm playing with Mimi.
 
