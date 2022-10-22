@@ -15,3 +15,45 @@ public struct Dependency<T>: DependencyRegistering {
         resolver.register(variant: variant, resolver: resolve, storer: store)
     }
 }
+
+public struct Persistent<T>: DependencyRegistering {
+    let resolve: () -> T
+    let variant: String?
+    
+    init(variant: String? = nil, _ resolve: @escaping () -> T) {
+        self.resolve = resolve
+        self.variant = variant
+    }
+    
+    public func register(resolver: Resolver) {
+        resolver.persistent(variant: variant, factory: resolve)
+    }
+}
+
+public struct Transient<T>: DependencyRegistering {
+    let resolve: () -> T
+    let variant: String?
+    
+    init(variant: String? = nil, _ resolve: @escaping () -> T) {
+        self.resolve = resolve
+        self.variant = variant
+    }
+    
+    public func register(resolver: Resolver) {
+        resolver.transient(variant: variant, factory: resolve)
+    }
+}
+
+public struct Ephemeral<T>: DependencyRegistering {
+    let resolve: () -> T
+    let variant: String?
+    
+    init(variant: String? = nil, _ resolve: @escaping () -> T) {
+        self.resolve = resolve
+        self.variant = variant
+    }
+    
+    public func register(resolver: Resolver) {
+        resolver.ephemeral(variant: variant, factory: resolve)
+    }
+}

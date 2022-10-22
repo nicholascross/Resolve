@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 @testable import Resolve
 
-final class RegirationTests: XCTestCase {
+final class RegistrationTests: XCTestCase {
     
     override func tearDown() {
         DependencyResolver.clearResolvers()
@@ -27,4 +27,16 @@ final class RegirationTests: XCTestCase {
         XCTAssertEqual(resolver.resolve(variant: "boop") as Int, 5)
     }
     
+    func testLifetime() {
+        DependencyResolver.register {
+            Persistent(variant: "a") { 6 }
+            Transient(variant: "b") { 5 }
+            Ephemeral(variant: "c") { 4 }
+        }
+        
+        let resolver = DependencyResolver()
+        XCTAssertEqual(resolver.resolve(variant: "a") as Int, 6)
+        XCTAssertEqual(resolver.resolve(variant: "b") as Int, 5)
+        XCTAssertEqual(resolver.resolve(variant: "c") as Int, 4)
+    }
 }
