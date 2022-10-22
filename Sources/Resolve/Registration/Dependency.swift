@@ -5,7 +5,7 @@ public struct Dependency<T>: DependencyRegistering {
     let store: (T) -> Void
     let variant: String?
     
-    init(variant: String? = nil, _ resolve: @escaping () -> T, store: ((T) -> Void)? = nil) {
+    public init(variant: String? = nil, _ resolve: @escaping () -> T, store: ((T) -> Void)? = nil) {
         self.resolve = resolve
         self.store = store ?? { _ in }
         self.variant = variant
@@ -20,7 +20,7 @@ public struct Persistent<T>: DependencyRegistering {
     let resolve: () -> T
     let variant: String?
     
-    init(variant: String? = nil, _ resolve: @escaping () -> T) {
+    public init(variant: String? = nil, _ resolve: @escaping () -> T) {
         self.resolve = resolve
         self.variant = variant
     }
@@ -34,7 +34,7 @@ public struct Transient<T>: DependencyRegistering {
     let resolve: () -> T
     let variant: String?
     
-    init(variant: String? = nil, _ resolve: @escaping () -> T) {
+    public init(variant: String? = nil, _ resolve: @escaping () -> T) {
         self.resolve = resolve
         self.variant = variant
     }
@@ -48,7 +48,7 @@ public struct Ephemeral<T>: DependencyRegistering {
     let resolve: () -> T
     let variant: String?
     
-    init(variant: String? = nil, _ resolve: @escaping () -> T) {
+    public init(variant: String? = nil, _ resolve: @escaping () -> T) {
         self.resolve = resolve
         self.variant = variant
     }
