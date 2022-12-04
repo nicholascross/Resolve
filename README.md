@@ -2,6 +2,8 @@
 
 A swift package to support dependency resolution with property wrapper support for ease of use.
 
+_NOTE: Whilst convenient for prototyping using this with non throw away code could be a maintainence issue if used without restrictions; since this obscures property ownership and at worst could be encouraging the [action at a distance](https://en.wikipedia.org/wiki/Action_at_a_distance_(computer_programming)) anti-pattern._
+
 ## Usage Example
 
 This is how you would do something similar to [Swinject basic usage](https://github.com/Swinject/Swinject#basic-usage)
